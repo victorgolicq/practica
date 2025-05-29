@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="background-overlay"></div>
+    <div id="particles-js" class="particles-container"></div>
+
+    <div id="notification-container"></div>
+
+    <div class="profile-panel-container hidden" id="profile-panel-container">
+        <div class="profile-panel-content card-effect">
+            <div class="profile-panel-handle">
+                <i class="fas fa-user-alt"></i>
+            </div>
+            <h3 class="profile-title">User Profile</h3>
+            <div class="profile-avatar">
+                <img id="profile-avatar-img" src="" alt="User Avatar" class="hidden">
+                <i id="profile-avatar-icon" class="fas fa-user-astronaut fa-5x"></i>
+                <button id="change-avatar-btn" class="btn secondary change-avatar-btn">
+                    <i class="fas fa-camera"></i>
+                </button>
+                <input type="file" id="avatar-upload-input" accept="image/*" class="hidden">
+            </div>
+            <div class="profile-details">
+                <p><strong>Username:</strong> <span id="profile-username"></span></p>
+                <hr>
+                <h4>Statistics</h4>
+                <p><strong>Total Tasks Created:</strong> <span id="profile-total-tasks">0</span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="category-panel-container hidden" id="category-panel-container">
+        <div class="category-panel-content card-effect">
+            <div class="category-panel-handle">
+                <i class="fas fa-tags"></i>
+            </div>
+            <h3 class="category-title">Categories</h3>
+            <div class="category-list" id="category-list">
+                <button class="category-item active" data-category-id="all">
+                    <i class="fas fa-tasks"></i> All Tasks
+                </button>
+                <button class="category-item" data-category-id="null">
+                    <i class="fas fa-folder-open"></i> Uncategorized
+                </button>
+            </div>
+            <div class="category-actions">
+                <button id="add-category-btn" class="btn primary add-category-btn"><i class="fas fa-plus"></i> Add Category</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="auth-container" id="auth-container">
+        <div class="auth-box card-effect">
+            <h1 class="app-title"><i class="fas fa-check-double"></i> TaskFlow</h1>
+            <h2>Login</h2>
+            <form id="login-form">
+                <div class="input-group floating-label">
+                    <input type="text" id="login-username" placeholder=" " required>
+                    <label for="login-username">Username</label>
+                </div>
+                <div class="input-group floating-label">
+                    <input type="password" id="login-password" placeholder=" " required>
+                    <label for="login-password">Password</label>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn primary">Login</button>
+                    <button type="button" id="show-register-modal-btn" class="btn secondary">Register</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="dashboard-wrapper hidden" id="task-dashboard-wrapper"> <div class="dashboard-header card-effect">
+            <h2 class="welcome-message">Welcome, <span id="welcome-username"></span>!</h2>
+            <button id="logout-button" class="btn danger"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+
+        <div class="dashboard-container" id="task-dashboard"> <section class="task-management-section card-effect">
+                <h3 class="section-title">Your Tasks</h3>
+                <div class="task-controls">
+                    <div class="main-control-buttons">
+                        <button id="add-task-btn" class="btn primary add-btn"><i class="fas fa-plus"></i> Add New Task</button>
+                        <button id="refresh-tasks-btn" class="btn secondary"><i class="fas fa-sync-alt"></i> Refresh Tasks</button>
+                    </div>
+
+                    <div class="filter-sort-group">
+                        <div class="input-group">
+                            <label for="filter-status"><i class="fas fa-filter"></i> Filter by Status:</label>
+                            <select id="filter-status">
+                                <option value="All">All</option>
+                                <option value="To Do">To Do</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Done">Done</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="sort-by"><i class="fas fa-sort"></i> Sort by:</label>
+                            <select id="sort-by">
+                                <option value="priority-desc">Priority (High to Low)</option>
+                                <option value="deadline-asc">Deadline (Soonest)</option>
+                                <option value="priority-asc">Priority (Low to High)</option>
+                                <option value="deadline-desc">Deadline (Latest)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-list" id="tasks-container">
+                    <p id="no-tasks-message" class="hidden">No tasks yet. Add one!</p>
+                </div>
+            </section>
+
+            <section class="calendar-section card-effect">
+                <h3 class="section-title">Tasks by Week</h3>
+                <div class="calendar-navigation">
+                    <button id="prev-week-btn" class="btn icon-btn"><i class="fas fa-chevron-left"></i></button>
+                    <span id="current-week-range"></span>
+                    <button id="next-week-btn" class="btn icon-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="calendar-grid" id="calendar-grid">
+                    </div>
+            </section>
+        </div>
+    </div>
+
+    <div id="task-modal" class="modal hidden">
+        <div class="modal-content card-effect">
+            <span class="close-button" data-modal-target="task-modal">&times;</span>
+            <h3 id="modal-title">Add New Task</h3>
+            <form id="task-form">
+                <input type="hidden" id="task-id">
+                <div class="input-group">
+                    <label for="modal-task-category">Category</label>
+                    <select id="modal-task-category">
+                        <option value="">No Category</option>
+                    </select>
+                </div>
+                <div class="input-group floating-label">
+                    <input type="text" id="modal-task-title" placeholder=" " required>
+                    <label for="modal-task-title">Title</label>
+                </div>
+                <div class="input-group floating-label">
+                    <textarea id="modal-task-description" placeholder=" "></textarea>
+                    <label for="modal-task-description">Description</label>
+                </div>
+                <div class="input-group floating-label">
+                    <input type="date" id="modal-task-deadline" placeholder=" ">
+                    <label for="modal-task-deadline">Deadline</label>
+                </div>
+                <div class="input-group">
+                    <label for="modal-task-priority">Priority</label>
+                    <select id="modal-task-priority">
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+                <div class="input-group" id="modal-status-group">
+                    <label for="modal-task-status">Status</label>
+                    <select id="modal-task-status">
+                        <option value="To Do">To Do</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Done">Done</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn primary" id="modal-submit-btn">Add Task</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="register-modal" class="modal hidden">
+        <div class="modal-content card-effect">
+            <span class="close-button" data-modal-target="register-modal">&times;</span>
+            <h3>Register New Account</h3>
+            <form id="register-form">
+                <div class="input-group floating-label">
+                    <input type="text" id="register-username" placeholder=" " required>
+                    <label for="register-username">Username</label>
+                </div>
+                <div class="input-group floating-label">
+                    <input type="password" id="register-password" placeholder=" " required>
+                    <label for="register-password">Password</label>
+                </div>
+                <div class="input-group floating-label">
+                    <input type="password" id="register-confirm-password" placeholder=" " required>
+                    <label for="register-confirm-password">Confirm Password</label>
+                </div>
+                <button type="submit" class="btn primary">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="category-modal" class="modal hidden">
+        <div class="modal-content card-effect">
+            <span class="close-button" data-modal-target="category-modal">&times;</span>
+            <h3 id="category-modal-title">Add New Category</h3>
+            <form id="category-form">
+                <input type="hidden" id="category-id">
+                <div class="input-group floating-label">
+                    <input type="text" id="category-name" placeholder=" " required>
+                    <label for="category-name">Category Name</label>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn primary" id="category-submit-btn">Add Category</button>
+                    <button type="button" class="btn danger hidden" id="category-delete-btn">Delete Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
